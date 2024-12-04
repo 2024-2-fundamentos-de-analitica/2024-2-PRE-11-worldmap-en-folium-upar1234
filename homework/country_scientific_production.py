@@ -63,8 +63,31 @@ def count_country_frequency(affiliations):
     countries = countries.str.split(", ")
     countries = countries.explode()
     countries = countries.value_counts()
-    print(countries)
+    # print(countries)
     return countries
+
+
+def plot_world_map(countries):
+    """Grafica un mapa mundial con la frecuencia de cada país."""
+
+    countries = countries.copy()
+    countries = countries.to_frame()
+    countries = countries.reset_index()
+
+    m = folium.Map(location=[0, 0], zoom_start=2)
+
+    folium.Choropleth(
+        geo_data=(
+            "https://raw.githubusercontent.com/python-visualization/"
+            "folium/master/examples/data/world-countries.json"
+        ),
+        data=countries,
+        columns=["countries", "count"],
+        key_on="feature.properties.name",
+        fill_color="Greens",
+    ).add_to(m)
+
+    m.save("files/output/map.html")
 
 
 
@@ -79,19 +102,9 @@ def make_worldmap():
     affiliations = add_countries_column(affiliations)
     affiliations = clean_countries(affiliations)
     countries = count_country_frequency(affiliations)
+    countries.to_csv("files/output/countries.csv")
+    plot_world_map(countries)
 
-    # print(affiliations)
 
 if __name__ == "__main__":
     make_worldmap()
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
